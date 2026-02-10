@@ -54,5 +54,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.core:core-ktx:1.12.0")
 
+    // NumberPicker
+    implementation("com.github.ShawnLin013:NumberPicker:v2.4.7")
+
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

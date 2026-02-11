@@ -10,6 +10,7 @@ import com.example.intervaltimer.notification.NotificationHelper
 import kotlin.math.ceil
 
 private const val TAG = "TimerService"
+private const val TICK_INTERVAL_MS = 250L
 
 class TimerService : Service() {
 
@@ -27,9 +28,9 @@ class TimerService : Service() {
 
     private var totalTimeMillis: Long = 0
     private var numberOfIntervals: Int = 1
-    private var intervalDurationSeconds: Long = 0
     private var notificationThresholds = mutableListOf<Long>()  // remaining seconds when to notify
     private var previousDisplaySeconds: Long = -1
+    private var nextIntervalNotificationNumber = 1
     private var isRunning = false
 
     inner class TimerBinder : Binder() {
@@ -56,35 +57,41 @@ class TimerService : Service() {
     }
 
     private fun startTimer() {
+        countDownTimer?.cancel()
+        countDownTimer = null
+
         val totalSeconds = totalTimeMillis / 1000
-        intervalDurationSeconds = totalSeconds / numberOfIntervals
+        if (totalSeconds <= 0L) {
+            isRunning = false
+            stopSelf()
+            return
+        }
+
         previousDisplaySeconds = -1
+        nextIntervalNotificationNumber = 1
         isRunning = true
 
-        // Build notification thresholds: for 10sec/2intervals -> notify at 5sec and 0sec
-        notificationThresholds.clear()
-        for (i in 1..numberOfIntervals) {
-            val threshold = totalSeconds - (i * intervalDurationSeconds)
-            notificationThresholds.add(threshold)
-        }
+        // Build notification thresholds: for 10sec/2intervals -> notify at 5sec
+        notificationThresholds = IntervalThresholds.build(totalSeconds, numberOfIntervals).toMutableList()
         Log.d(TAG, "Starting timer: total=${totalSeconds}s, intervals=$numberOfIntervals, thresholds=$notificationThresholds")
 
         val initialNotification = notificationHelper.createForegroundNotification(formatTime(totalTimeMillis))
         startForeground(NotificationHelper.FOREGROUND_NOTIFICATION_ID, initialNotification)
 
-        countDownTimer = object : CountDownTimer(totalTimeMillis, 50) {
+        countDownTimer = object : CountDownTimer(totalTimeMillis, TICK_INTERVAL_MS) {
             override fun onTick(millisUntilFinished: Long) {
                 // Use ceiling so 4999ms shows as 5sec, 4001ms shows as 5sec, 4000ms shows as 4sec
                 val displaySeconds = ceil(millisUntilFinished / 1000.0).toLong()
 
-                notificationHelper.updateForegroundNotification(formatTime(displaySeconds * 1000))
+                if (displaySeconds != previousDisplaySeconds) {
+                    notificationHelper.updateForegroundNotification(formatTime(displaySeconds * 1000))
 
-                // Check if we crossed a threshold
-                if (displaySeconds != previousDisplaySeconds && notificationThresholds.isNotEmpty()) {
-                    if (displaySeconds == notificationThresholds.first()) {
-                        val intervalNum = numberOfIntervals - notificationThresholds.size + 1
+                    // Handle delayed ticks too: notify for each crossed threshold.
+                    while (notificationThresholds.isNotEmpty() && displaySeconds <= notificationThresholds.first()) {
+                        val intervalNum = nextIntervalNotificationNumber
                         Log.d(TAG, "Interval $intervalNum notification at ${displaySeconds}s remaining")
                         notificationHelper.showIntervalNotification(intervalNum, numberOfIntervals)
+                        nextIntervalNotificationNumber += 1
                         notificationThresholds.removeAt(0)
                     }
                 }

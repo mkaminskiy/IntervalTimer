@@ -96,7 +96,12 @@ class MainActivity : ComponentActivity() {
             addAction(TimerService.ACTION_TICK)
             addAction(TimerService.ACTION_FINISH)
         }
-        registerReceiver(tickReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        ContextCompat.registerReceiver(
+            this,
+            tickReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override fun onStop() {
@@ -142,11 +147,11 @@ class MainActivity : ComponentActivity() {
             putExtra(TimerService.EXTRA_INTERVALS, intervals)
         }
         startForegroundService(intent)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     private fun stopTimer() {
         timerService?.stopTimer()
+        stopService(Intent(this, TimerService::class.java))
         remainingTime = 0L
         isTimerRunning = false
     }

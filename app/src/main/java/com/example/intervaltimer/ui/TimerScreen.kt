@@ -7,9 +7,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.intervaltimer.R
 import kotlin.math.ceil
 
 @Composable
@@ -62,7 +64,7 @@ private fun SetupScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Set Timer",
+            text = stringResource(R.string.set_timer_title),
             fontSize = 28.sp,
             color = MaterialTheme.colorScheme.primary
         )
@@ -79,7 +81,7 @@ private fun SetupScreen(
                 value = minutes,
                 onValueChange = onMinutesChange,
                 range = 0..59,
-                label = "Minutes",
+                label = stringResource(R.string.minutes_label),
                 modifier = Modifier.weight(1f)
             )
 
@@ -93,7 +95,7 @@ private fun SetupScreen(
                 value = seconds,
                 onValueChange = onSecondsChange,
                 range = 0..59,
-                label = "Seconds",
+                label = stringResource(R.string.seconds_label),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -105,7 +107,7 @@ private fun SetupScreen(
             value = intervals,
             onValueChange = onIntervalsChange,
             range = 1..10,
-            label = "Intervals",
+            label = stringResource(R.string.intervals_label),
             modifier = Modifier.fillMaxWidth(),
             horizontal = true,
             formatter = { it.toString() }
@@ -120,7 +122,7 @@ private fun SetupScreen(
                 .height(80.dp),
             enabled = minutes > 0 || seconds > 0
         ) {
-            Text("Start", fontSize = 28.sp)
+            Text(stringResource(R.string.start_button), fontSize = 28.sp)
         }
     }
 }
@@ -157,7 +159,7 @@ private fun RunningTimerScreen(
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
         ) {
-            Text("Stop", fontSize = 18.sp)
+            Text(stringResource(R.string.stop_button), fontSize = 18.sp)
         }
     }
 }

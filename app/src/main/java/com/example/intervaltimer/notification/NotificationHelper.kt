@@ -57,8 +57,8 @@ class NotificationHelper(private val context: Context) {
         )
 
         return NotificationCompat.Builder(context, TIMER_CHANNEL_ID)
-            .setContentTitle("Interval Timer")
-            .setContentText("Remaining: $remainingTime")
+            .setContentTitle(context.getString(R.string.foreground_title))
+            .setContentText(context.getString(R.string.foreground_remaining, remainingTime))
             .setSmallIcon(android.R.drawable.ic_media_play)
             .setOngoing(true)
             .setContentIntent(pendingIntent)
@@ -73,8 +73,8 @@ class NotificationHelper(private val context: Context) {
 
     fun showIntervalNotification(intervalNumber: Int, totalIntervals: Int) {
         val notification = NotificationCompat.Builder(context, INTERVAL_CHANNEL_ID)
-            .setContentTitle("Interval $intervalNumber of $totalIntervals")
-            .setContentText("Next interval started!")
+            .setContentTitle(context.getString(R.string.interval_title, intervalNumber, totalIntervals))
+            .setContentText(context.getString(R.string.interval_text))
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -90,8 +90,8 @@ class NotificationHelper(private val context: Context) {
 
     fun showFinishNotification() {
         val notification = NotificationCompat.Builder(context, INTERVAL_CHANNEL_ID)
-            .setContentTitle("Timer Complete!")
-            .setContentText("All intervals finished")
+            .setContentTitle(context.getString(R.string.finish_title))
+            .setContentText(context.getString(R.string.finish_text))
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

@@ -44,6 +44,14 @@ android {
 }
 
 dependencies {
+    val gradleHome = requireNotNull(gradle.gradleHomeDir) {
+        "Gradle home directory is not available"
+    }
+    val gradleTestLibs = fileTree(gradleHome.resolve("lib")) {
+        include("junit-*.jar")
+        include("hamcrest-*.jar")
+    }
+
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
@@ -56,6 +64,8 @@ dependencies {
 
     // NumberPicker
     implementation("com.github.ShawnLin013:NumberPicker:v2.4.7")
+
+    testImplementation(gradleTestLibs)
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

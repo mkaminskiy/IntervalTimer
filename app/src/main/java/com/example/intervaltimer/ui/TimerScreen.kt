@@ -1,10 +1,12 @@
 package com.example.intervaltimer.ui
 
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -17,9 +19,10 @@ fun TimerScreen(
     onStart: (minutes: Int, seconds: Int, intervals: Int) -> Unit,
     onStop: () -> Unit
 ) {
-    var minutes by remember { mutableIntStateOf(1) }
-    var seconds by remember { mutableIntStateOf(0) }
-    var intervals by remember { mutableIntStateOf(2) }
+    val prefs = LocalContext.current.getSharedPreferences("timer_settings", Context.MODE_PRIVATE)
+    var minutes by remember { mutableIntStateOf(prefs.getInt("minutes", 1)) }
+    var seconds by remember { mutableIntStateOf(prefs.getInt("seconds", 0)) }
+    var intervals by remember { mutableIntStateOf(prefs.getInt("intervals", 2)) }
 
     if (isRunning) {
         // Timer running screen
@@ -31,11 +34,11 @@ fun TimerScreen(
         // Setup screen
         SetupScreen(
             minutes = minutes,
-            onMinutesChange = { minutes = it },
+            onMinutesChange = { minutes = it; prefs.edit().putInt("minutes", it).apply() },
             seconds = seconds,
-            onSecondsChange = { seconds = it },
+            onSecondsChange = { seconds = it; prefs.edit().putInt("seconds", it).apply() },
             intervals = intervals,
-            onIntervalsChange = { intervals = it },
+            onIntervalsChange = { intervals = it; prefs.edit().putInt("intervals", it).apply() },
             onStart = { onStart(minutes, seconds, intervals) }
         )
     }

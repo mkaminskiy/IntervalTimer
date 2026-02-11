@@ -17,7 +17,9 @@ fun NumberPicker(
     onValueChange: (Int) -> Unit,
     range: IntRange,
     modifier: Modifier = Modifier,
-    label: String = ""
+    label: String = "",
+    horizontal: Boolean = false,
+    formatter: ((Int) -> String)? = null
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
@@ -36,18 +38,24 @@ fun NumberPicker(
         }
 
         AndroidView(
-            modifier = Modifier.height(150.dp),
+            modifier = if (horizontal) Modifier.height(80.dp) else Modifier.height(180.dp),
             factory = { context ->
                 ShawnNumberPicker(context).apply {
                     minValue = range.first
                     maxValue = range.last
                     this.value = value
+                    wrapSelectorWheel = false
                     setSelectedTextColor(primaryColor)
                     textColor = onSurfaceColor
-                    selectedTextSize = 80f
-                    textSize = 50f
+                    selectedTextSize = 120f
+                    textSize = 70f
                     wheelItemCount = 3
-                    setFormatter { String.format("%02d", it) }
+                    if (horizontal) {
+                        orientation = ShawnNumberPicker.HORIZONTAL
+                    }
+                    setFormatter { v ->
+                        formatter?.invoke(v) ?: String.format("%02d", v)
+                    }
                     setOnValueChangedListener { _, _, newVal ->
                         onValueChange(newVal)
                     }

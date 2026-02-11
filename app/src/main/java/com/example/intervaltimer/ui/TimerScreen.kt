@@ -103,7 +103,9 @@ private fun SetupScreen(
             onValueChange = onIntervalsChange,
             range = 1..10,
             label = "Intervals",
-            modifier = Modifier.width(120.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontal = true,
+            formatter = { it.toString() }
         )
 
         Spacer(modifier = Modifier.height(48.dp))
@@ -112,10 +114,10 @@ private fun SetupScreen(
             onClick = onStart,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(80.dp),
             enabled = minutes > 0 || seconds > 0
         ) {
-            Text("Start", fontSize = 18.sp)
+            Text("Start", fontSize = 28.sp)
         }
     }
 }

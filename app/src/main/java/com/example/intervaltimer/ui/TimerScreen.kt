@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.intervaltimer.R
-import kotlin.math.ceil
+import com.example.intervaltimer.service.TimeUtils
 
 @Composable
 fun TimerScreen(
@@ -132,7 +132,7 @@ private fun RunningTimerScreen(
     remainingTimeMillis: Long,
     onStop: () -> Unit
 ) {
-    val displaySeconds = ceil(remainingTimeMillis / 1000.0).toLong()
+    val displaySeconds = TimeUtils.displaySeconds(remainingTimeMillis)
 
     Column(
         modifier = Modifier
@@ -143,7 +143,7 @@ private fun RunningTimerScreen(
     ) {
         // Large timer display
         Text(
-            text = formatTime(displaySeconds * 1000),
+            text = TimeUtils.formatTime(displaySeconds * 1000),
             fontSize = 96.sp,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.primary
@@ -162,11 +162,4 @@ private fun RunningTimerScreen(
             Text(stringResource(R.string.stop_button), fontSize = 18.sp)
         }
     }
-}
-
-private fun formatTime(millis: Long): String {
-    val totalSeconds = millis / 1000
-    val minutes = totalSeconds / 60
-    val seconds = totalSeconds % 60
-    return String.format("%02d:%02d", minutes, seconds)
 }

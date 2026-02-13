@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.example.intervaltimer.service.TimeUtils
 import com.example.intervaltimer.service.TimerService
 import com.example.intervaltimer.ui.TimerScreen
 import com.example.intervaltimer.ui.theme.IntervalTimerTheme
@@ -138,7 +139,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startTimer(minutes: Int, seconds: Int, intervals: Int) {
-        val totalTimeMillis = ((minutes * 60L) + seconds) * 1000L
+        val totalTimeMillis = TimeUtils.toMillis(minutes, seconds)
         remainingTime = totalTimeMillis
         isTimerRunning = true
 

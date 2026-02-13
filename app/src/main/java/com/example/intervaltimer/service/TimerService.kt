@@ -7,7 +7,6 @@ import android.os.CountDownTimer
 import android.os.IBinder
 import android.util.Log
 import com.example.intervaltimer.notification.NotificationHelper
-import kotlin.math.ceil
 
 private const val TAG = "TimerService"
 private const val TICK_INTERVAL_MS = 250L
@@ -75,16 +74,16 @@ class TimerService : Service() {
         notificationThresholds = IntervalThresholds.build(totalSeconds, numberOfIntervals).toMutableList()
         Log.d(TAG, "Starting timer: total=${totalSeconds}s, intervals=$numberOfIntervals, thresholds=$notificationThresholds")
 
-        val initialNotification = notificationHelper.createForegroundNotification(formatTime(totalTimeMillis))
+        val initialNotification = notificationHelper.createForegroundNotification(TimeUtils.formatTime(totalTimeMillis))
         startForeground(NotificationHelper.FOREGROUND_NOTIFICATION_ID, initialNotification)
 
         countDownTimer = object : CountDownTimer(totalTimeMillis, TICK_INTERVAL_MS) {
             override fun onTick(millisUntilFinished: Long) {
                 // Use ceiling so 4999ms shows as 5sec, 4001ms shows as 5sec, 4000ms shows as 4sec
-                val displaySeconds = ceil(millisUntilFinished / 1000.0).toLong()
+                val displaySeconds = TimeUtils.displaySeconds(millisUntilFinished)
 
                 if (displaySeconds != previousDisplaySeconds) {
-                    notificationHelper.updateForegroundNotification(formatTime(displaySeconds * 1000))
+                    notificationHelper.updateForegroundNotification(TimeUtils.formatTime(displaySeconds * 1000))
 
                     // Handle delayed ticks too: notify for each crossed threshold.
                     while (notificationThresholds.isNotEmpty() && displaySeconds <= notificationThresholds.first()) {
@@ -132,13 +131,6 @@ class TimerService : Service() {
     }
 
     fun isTimerRunning(): Boolean = isRunning
-
-    private fun formatTime(millis: Long): String {
-        val totalSeconds = millis / 1000
-        val minutes = totalSeconds / 60
-        val seconds = totalSeconds % 60
-        return String.format("%02d:%02d", minutes, seconds)
-    }
 
     override fun onDestroy() {
         countDownTimer?.cancel()
